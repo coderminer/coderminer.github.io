@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="null">
+    <meta name="keyword"  content="undefined">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          Android 使用ContentProvider在应用间共享数据 - 矿工日志
+        
+    </title>
+
+    <link rel="canonical" href="https://coderminer.github.io/2016/11/18/contentprovider/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">矿工日志</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://coderminer.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/undefined')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#ContentProvider" title="ContentProvider">ContentProvider</a>
+                        
+                    </div>
+                    <h1>Android 使用ContentProvider在应用间共享数据</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by coderminer on
+                        2016-11-18
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3 id="Android-使用ContentProvider在应用间共享数据"><a href="#Android-使用ContentProvider在应用间共享数据" class="headerlink" title="Android 使用ContentProvider在应用间共享数据"></a>Android 使用ContentProvider在应用间共享数据</h3><p>  <img src="http://7xplrz.com1.z0.glb.clouddn.com/jianshu/android/6H_1.jpg" alt="题图 www.gratisography.com"></p>
+<p>  在开发的过程中，有时会有需求要实现应用程序之间实现数据共享，在<code>Android</code>系统中提供了一个内容提供者<code>ContentProvider</code><br>  可以实现这个功能，需要继承这个类，并实现相关的接口，其他的应用就可以通过uri来访问相关的数据，在<code>Android</code>中最常见的<br>  内容提供者就是<code>MediaProvider</code>，所有的应用都可以通过uri来访问系统中的媒体数据，我们也可以实现这样的功能，首先就是要<br>  确定你的应用是否要向外提供数据</p>
+<p>  <a href="https://github.com/coderminer/Demo_Public/tree/master/gank" target="_blank" rel="external">工程代码</a></p>
+<h4 id="设计数据存储"><a href="#设计数据存储" class="headerlink" title="设计数据存储"></a>设计数据存储</h4><p>  我们这里是通过数据库最为媒介来提供数据，需要设计具体的数据库的数据结构，通过系统提供的<code>SQLiteOpenHelper</code>类来创建数据库<br>  核心的代码：</p>
+<p>  简单的数据结构，根据自己的需求设计数据库的数据结构</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public final class Settings implements BaseColumns&#123;</div><div class="line">  private Settings()&#123;&#125;</div><div class="line"></div><div class="line">  public static final String TABLE_NAME = &quot;settings&quot;;  //数据库中标的名称</div><div class="line"></div><div class="line">  public static final String COLUMN_NAME_TITLE = &quot;name&quot;; //表中的列名</div><div class="line">  public static final String COLUMN_NAME_VALUE = &quot;value&quot;; //表中的列名</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  继承<code>SQLiteOpenHelper</code>来创建数据库</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">private static class DatabaseHelper extends SQLiteOpenHelper&#123;</div><div class="line">  public DatabaseHelper(Context context) &#123;</div><div class="line">      super(context, DB_NAME, null, DB_VERSION);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) &#123;</div><div class="line">      db.execSQL(&quot;DROP TABLE IF EXISTS settings&quot;);</div><div class="line">      onCreate(db);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  public void onCreate(SQLiteDatabase db) &#123;</div><div class="line">      String sql = &quot; CREATE TABLE &quot;+Settings.TABLE_NAME +&quot; (&quot;</div><div class="line">              + Settings._ID +&quot; INTEGER PRIMARY KEY,&quot;</div><div class="line">              + Settings.COLUMN_NAME_TITLE +&quot; TEXT,&quot;</div><div class="line">              + Settings.COLUMN_NAME_VALUE +&quot; TEXT&quot;</div><div class="line">              + &quot;);&quot;;</div><div class="line">      db.execSQL(sql);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="内容提供者"><a href="#内容提供者" class="headerlink" title="内容提供者"></a>内容提供者</h4><p>  <code>ContentProvider</code>需重载的接口如下：</p>
+<ul>
+<li>public Uri insert(Uri uri, ContentValues values)</li>
+<li>public int delete(Uri uri, String selection, String[] selectionArgs)</li>
+<li>public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs)</li>
+<li>public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)</li>
+<li><p>public String getType(Uri uri)</p>
+<p>URI的设计</p>
+<p>[content://][com.example.demo.gank.provider][/settings][/1]<br>|—–A—–|—————B—————|—–C—-|–D-|</p>
+</li>
+<li><p>A：是Scheme,固定为<code>content://</code></p>
+</li>
+<li>B: 是Authority,用来识别特定的<code>Content Provider</code>，一般使用应用的报名来命名</li>
+<li>C：是资源的路径</li>
+<li><p>D: 资源的ID</p>
+<p>为了传入的uri执行不同的操作，可以通过Android中的<code>UriMatcher</code>实体类，将uri映射不同的内容</p>
+</li>
+</ul>
+<h4 id="设置权限"><a href="#设置权限" class="headerlink" title="设置权限"></a>设置权限</h4><p>  可以为provider设置权限</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    package=&quot;com.example.demo.gank&quot;&gt;</div><div class="line">    。。。。</div><div class="line">    &lt;permission android:name=&quot;com.example.demo.gank.provider.READ_PROVIDER&quot; android:protectionLevel=&quot;normal&quot;&gt;&lt;/permission&gt;</div><div class="line">    &lt;permission android:name=&quot;com.example.demo.gank.provider.WRITE_PROVIDER&quot; android:protectionLevel=&quot;normal&quot;&gt;&lt;/permission&gt;</div><div class="line"></div><div class="line">    &lt;application</div><div class="line">        android:allowBackup=&quot;true&quot;</div><div class="line">        android:icon=&quot;@mipmap/ic_launcher&quot;</div><div class="line">        android:label=&quot;@string/app_name&quot;</div><div class="line">        android:supportsRtl=&quot;true&quot;</div><div class="line">        android:theme=&quot;@style/AppTheme&quot;&gt;</div><div class="line"></div><div class="line">        &lt;provider</div><div class="line">            android:authorities=&quot;com.example.demo.gank.provider&quot;</div><div class="line">            android:name=&quot;com.example.demo.gank.provider.SettingsProvider&quot;</div><div class="line">            android:readPermission=&quot;com.example.demo.gank.provider.READ_PROVIDER&quot;</div><div class="line">            android:writePermission=&quot;com.example.demo.gank.provider.WRITE_PROVIDER&quot;</div><div class="line">            android:exported=&quot;true&quot;&gt;</div><div class="line"></div><div class="line">        &lt;/provider&gt;</div><div class="line">    &lt;/application&gt;</div><div class="line"></div><div class="line">&lt;/manifest&gt;</div></pre></td></tr></table></figure>
+<p>  运行工程，这个工程应用是A，A应用安装之后，这个应用就是一个内容提供者</p>
+<p>  再建一个工程B，在B中访问数据,这个是工程B中访问数据库的代码</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Uri uri = Uri.parse(&quot;content://com.example.demo.gank.provider/settings&quot;); //和A中提供的uri保持一致</div><div class="line">Cursor c = getContentResolver().query(uri,new String[]&#123;&quot;name&quot;,&quot;value&quot;&#125;,&quot; name =? &quot;, //是在A中定义的数据库的字段</div><div class="line">                  new String[]&#123;&quot;settings&quot;&#125;,null);</div><div class="line">          if(c != null &amp;&amp; c.moveToFirst())&#123;</div><div class="line">              String value = c.getString(c.getColumnIndex(&quot;value&quot;));</div><div class="line">              log.e(TAG,&quot;=================query value: &quot;+value);</div><div class="line">          &#125;</div></pre></td></tr></table></figure>
+<p>  在B中的<code>AndroidManifest.xml&#39;</code>中加入相关的权限</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;com.example.demo.gank.provider.READ_PROVIDER&quot;/&gt;</div><div class="line">&lt;uses-permission android:name=&quot;com.example.demo.gank.provider.WRITE_PROVIDER&quot;/&gt;</div></pre></td></tr></table></figure>
+<p>  运行结果就是得到A中数据库的内容</p>
+<h4 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h4><p>  核心的逻辑代码，具体的代码请参考源码 <a href="https://github.com/coderminer/Demo_Public/tree/master/gank" target="_blank" rel="external">工程源码</a></p>
+<p>  Settings.java<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public static final String SCHEME = &quot;content://&quot;;</div><div class="line"></div><div class="line">private static final String PATH_SETTINGS = &quot;/settings&quot;;</div><div class="line">private static final String PATH_SETTINGS_ID = &quot;/settings/&quot;;</div><div class="line"></div><div class="line">public static final String CONTENT_TYPE = &quot;vnd.android.cursor.dir/vnd.com.example.demo.gank.settings&quot;;</div><div class="line">public static final String CONTENT_ITEM_TYPE = &quot;vnd.android.cursor.item/vnd.com.example.demo.gank.settings&quot;;</div></pre></td></tr></table></figure></p>
+<p>  SettingsProvider.java</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line">public class SettingsProvider extends ContentProvider&#123;</div><div class="line"></div><div class="line">  private static final String DB_NAME = &quot;settings.db&quot;;</div><div class="line">  private static final int DB_VERSION = 1;</div><div class="line"></div><div class="line">  private static final int SETTINGS = 1;</div><div class="line">  private static final int SETTINGS_ID = 2;</div><div class="line">  //....</div><div class="line"></div><div class="line">  static &#123;</div><div class="line">      sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);</div><div class="line"></div><div class="line">      sUriMatcher.addURI(Settings.AUTHORITY,&quot;settings&quot;,SETTINGS);</div><div class="line">      sUriMatcher.addURI(Settings.AUTHORITY,&quot;settings/#&quot;,SETTINGS_ID);</div><div class="line"></div><div class="line">      sProjectionMap = new HashMap&lt;&gt;();</div><div class="line">      sProjectionMap.put(Settings.COLUMN_NAME_TITLE,Settings.COLUMN_NAME_TITLE);</div><div class="line">      sProjectionMap.put(Settings.COLUMN_NAME_VALUE,Settings.COLUMN_NAME_VALUE);</div><div class="line">      sProjectionMap.put(Settings._ID,Settings._ID);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Nullable</div><div class="line">  @Override</div><div class="line">  public Uri insert(Uri uri, ContentValues values) &#123;</div><div class="line">      return null;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  public int delete(Uri uri, String selection, String[] selectionArgs) &#123;</div><div class="line">      return 0;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) &#123;</div><div class="line">      return 0;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Nullable</div><div class="line">  @Override</div><div class="line">  public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) &#123;</div><div class="line">      return null;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Nullable</div><div class="line">  @Override</div><div class="line">  public String getType(Uri uri) &#123;</div><div class="line">      return null;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  public boolean onCreate() &#123;</div><div class="line">      mOPenHelper = new DatabaseHelper(getContext());</div><div class="line">      return true;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  private static class DatabaseHelper extends SQLiteOpenHelper&#123;</div><div class="line">      //具体的代码请参看源码</div><div class="line">      //。。。。</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2016/11/18/androidfiles/" data-toggle="tooltip" data-placement="top" title="Android文件储存系统 应用篇">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2016/11/18/btbroadcast/" data-toggle="tooltip" data-placement="top" title="Android 蓝牙相关的广播">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/codeminer-33">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/gbaidu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/coderminer">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+				<!--
+                <p class="copyright text-muted">
+                    Copyright &copy; 矿工日志 2016 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks">Kaijun</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
+                    </iframe>
+                </p> -->
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://coderminer.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.staticfile.org/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://coderminer.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

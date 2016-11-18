@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="null">
+    <meta name="keyword"  content="undefined">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          Android文件储存系统 应用篇 - 矿工日志
+        
+    </title>
+
+    <link rel="canonical" href="https://coderminer.github.io/2016/11/18/androidfiles/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">矿工日志</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://coderminer.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/undefined')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#Storage" title="Storage">Storage</a>
+                        
+                          <a class="tag" href="/tags/#SharedPreferences" title="SharedPreferences">SharedPreferences</a>
+                        
+                    </div>
+                    <h1>Android文件储存系统 应用篇</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by coderminer on
+                        2016-11-18
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3 id="Android文件储存系统-应用篇"><a href="#Android文件储存系统-应用篇" class="headerlink" title="Android文件储存系统 应用篇"></a>Android文件储存系统 应用篇</h3><p>  Android系统中为应用储存提供了不同的选择，开发者可以根据自己的需求选择不同类型的储存形式<br>  系统本身提供了以下几种储存方式  </p>
+<h4 id="Shared-Preferences"><a href="#Shared-Preferences" class="headerlink" title="Shared Preferences"></a>Shared Preferences</h4><p>  以<code>key-value</code>的形式储存私人的原始数据,系统提供了两种方法来获取<code>SharedPreferences</code>对象  </p>
+<ul>
+<li>getSharedPreferences(String prefer_name,int mode) 需要提供一个preference文件的名字</li>
+<li><p>getPreferences(int mode) 不需要提供名字，应该是包名作为perference的名字<br>mode 通常是 MODE_PRIVATE,这样其他的应用是无法获得这个文件的数据的,在<code>SharedPreferences</code><br>储存的位置在 <code>/data/data/应用报名/sharef_pref/对应的perference的名字.xml</code>中  </p>
+<p>写入数据  </p>
+</li>
+</ul>
+<ol>
+<li>获得<code>edit()</code>一个 <code>SharedPreferences.Editor</code></li>
+<li>使用对应的方法写入不同类型的数据  </li>
+<li><p>使用<code>commit()</code>方法，将数据写入</p>
+<p><code>SharedPreferences</code> 提供的写入数据的方法如下,根据自己的需求使用对应的方法   </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">SharedPreferences preference = this.getPreferences(MODE_PRIVATE);</div><div class="line">SharedPreferences.Editor editor = preference.edit();</div><div class="line"></div><div class="line">editor.putBoolean(String key, boolean value);</div><div class="line">editor.putFloat(String key, flost value);</div><div class="line">editor.putInt(String key, int value);</div><div class="line">editor.putLong(String key, long value);</div><div class="line">editor.putString(String key, String value);</div><div class="line">editor.putStringSet(String key, Set&lt;String&gt; values);</div><div class="line"></div><div class="line">editor.commit();</div></pre></td></tr></table></figure>
+<p>读取，只需要使用<code>SharedPreferences</code>提供的get方法即可，此外还提供了其他的方法，<code>contains(String key)</code><br>判断是否已经存在对应的key，<code>registerOnSharedPreferenceChangeListener</code>和<code>unregisterOnSharedPreferenceChangeListener</code><br>监听对应的key值的变化，<strong>只有当key对应的value值发生变化时，才会触发</strong>，获取所有的值的方法<code>Map&lt;String,?&gt; getAll()</code>  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">SharedPreferences prefer = this.getPreferences(MODE_PRIVATE);</div><div class="line">//获取所有的数据，并遍历</div><div class="line">Map&lt;String,?&gt; all = prefer.getAll();</div><div class="line">for(Map.Entry&lt;String, ?&gt; entry : all.entrySet())&#123;</div><div class="line">    Log.e(&quot;tag&quot;, &quot;prefer: &quot;+entry.getKey()+&quot; &quot;+entry.getValue());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>监听数据的变化,当key的value值发生变化时，才会触发回调，退出时记得接触注册 <code>unregisterOnSharedPreferenceChangeListener</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">preference.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener()&#123;</div><div class="line"></div><div class="line">          @Override</div><div class="line">          public void onSharedPreferenceChanged(</div><div class="line">                  SharedPreferences sharedPreferences, String key) &#123;</div><div class="line">              Log.e(&quot;tag&quot;, &quot;=====================key &quot;+key);</div><div class="line">          &#125;</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="内部储存"><a href="#内部储存" class="headerlink" title="内部储存"></a>内部储存</h4><p>  你可以直接在设备的内部储存文件，默认的情况下，文件是私有的其他的应用无法访问，用户也无法访问，<br>  当应用卸载时，对用的文件也将被删除<br>  <strong>创建文件</strong>  </p>
+<ul>
+<li>调用 <code>openFileOutput()</code>,传入对应的文件名和访问模式，</li>
+<li>使用<code>write()</code>方法向文件写入数据</li>
+<li><p>关闭文件流 <code>close()</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">String FILENAME = &quot;test&quot;;</div><div class="line">String content = &quot;this a test for internal storage&quot;;</div><div class="line">try &#123;</div><div class="line">    FileOutputStream fos = this.openFileOutput(FILENAME, Context.MODE_PRIVATE);</div><div class="line">    fos.write(content.getBytes());</div><div class="line">    fos.close();</div><div class="line">&#125; catch (FileNotFoundException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125; catch (IOException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>常用的几种模式  </p>
+</li>
+<li><p>MODE_APPEND //如果文件也将存在，会在文件中追加数据，之前的数据会保留</p>
+</li>
+<li>MODE_PRIVATE //这个是默认的模式，只能应用本身才能访问，其他的应用无法访问</li>
+<li>MODE_WORLD_READABLE //api 17之后也将不在呢使用，会导致安全漏洞，其他的应用也可以访问不建议使用在api 17 之后会引起安全异常</li>
+<li><p>MODE_WORLD_WRITEABLE //其他的应用有写的权限，api 17之后也将废除，不建议使用，会引起安全漏洞</p>
+<p><strong>读取内容</strong>  </p>
+</li>
+<li><p>调用<code>openFileOutput</code> 传入对应的文件名</p>
+</li>
+<li>调用<code>read()</code>方法</li>
+<li><p>关闭文件流<code>close()</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">try &#123;</div><div class="line">  FileInputStream fis = this.openFileInput(FILENAME);</div><div class="line">  int len = fis.available();//获取文件长度</div><div class="line">  byte[] buffer = new byte[len];</div><div class="line">  fis.read(buffer);</div><div class="line">  Log.e(&quot;tag&quot;, &quot;=======result: &quot;+new String(buffer));</div><div class="line">  fis.close();</div><div class="line">&#125; catch (FileNotFoundException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125; catch (IOException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>删除文件</strong><br>调用 <code>boolean result = this.deleteFile(FILENAME);</code>  ,只需要传入文件名即可  </p>
+</li>
+</ul>
+<h4 id="外部储存"><a href="#外部储存" class="headerlink" title="外部储存"></a>外部储存</h4><p>  就是通常说的sdcard，访问sdcard需要相应的读写权限<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;/&gt;</div><div class="line">&lt;uses-permission android:name=&quot;android.permission.READ_EXTERNAL_STORAGE&quot;/&gt;</div></pre></td></tr></table></figure></p>
+<p>  在我们访问sdcard的储存之前，需要检查sdcard的状态是否可读,如果是可读的状态，我们就可以创建<br>  文件并进行读写操作</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">/* Checks if external storage is available for read and write */</div><div class="line">public boolean isExternalStorageWritable() &#123;</div><div class="line">    String state = Environment.getExternalStorageState();</div><div class="line">    if (Environment.MEDIA_MOUNTED.equals(state)) &#123;</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line">    return false;</div><div class="line">&#125;</div><div class="line"></div><div class="line">/* Checks if external storage is available to at least read */</div><div class="line">public boolean isExternalStorageReadable() &#123;</div><div class="line">    String state = Environment.getExternalStorageState();</div><div class="line">    if (Environment.MEDIA_MOUNTED.equals(state) ||</div><div class="line">        Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) &#123;</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line">    return false;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  <strong>外部私有数据</strong><br>  有时也会将一些缓存数据放在外置sdcard中，<code>/storage/emulated/0/Android/data/com.example.demo/files</code>中<br>  可以通过方法 <code>this.getExternalFilesDir(null)</code>方法来获得相应的路径，创建文件并进行读写，这个通过这个方法<br>  创建的文件在查询卸载时也会对应的删除，这个方法也接受对应的参数  </p>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2016/11/18/contentprovider/" data-toggle="tooltip" data-placement="top" title="Android 使用ContentProvider在应用间共享数据">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/codeminer-33">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/gbaidu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/coderminer">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+				<!--
+                <p class="copyright text-muted">
+                    Copyright &copy; 矿工日志 2016 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks">Kaijun</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
+                    </iframe>
+                </p> -->
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://coderminer.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.staticfile.org/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://coderminer.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

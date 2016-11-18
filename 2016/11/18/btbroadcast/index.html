@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="null">
+    <meta name="keyword"  content="undefined">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          Android 蓝牙相关的广播 - 矿工日志
+        
+    </title>
+
+    <link rel="canonical" href="https://coderminer.github.io/2016/11/18/btbroadcast/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">矿工日志</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://coderminer.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/undefined')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#Bluetooth" title="Bluetooth">Bluetooth</a>
+                        
+                          <a class="tag" href="/tags/#Broadcast" title="Broadcast">Broadcast</a>
+                        
+                    </div>
+                    <h1>Android 蓝牙相关的广播</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by coderminer on
+                        2016-11-18
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3 id="Android-蓝牙相关的广播"><a href="#Android-蓝牙相关的广播" class="headerlink" title="Android 蓝牙相关的广播"></a>Android 蓝牙相关的广播</h3><p>  监听蓝牙相关的广播并获得相关的信息，蓝牙相关的广播主要集中在<code>BluetoothAdapter</code>和<code>BluetoothDevice</code>类中，<br>  可以通过在<code>AndroidManifest.xml</code>中注册静态广播，也可以通过在代码中注册动态广播，两种形式的广播都可以监听到<br>  需要相关的权限</p>
+<blockquote>
+<p><uses-permission android:name="android.permission.BLUETOOTH"></uses-permission></p>
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN">
+
+</uses-permission></blockquote>
+<h4 id="蓝牙开关状态的广播"><a href="#蓝牙开关状态的广播" class="headerlink" title="蓝牙开关状态的广播"></a>蓝牙开关状态的广播</h4><p>  蓝牙的开关状态</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">int STATE_OFF = 10; //蓝牙关闭</div><div class="line">int STATE_ON = 12; //蓝牙打开</div><div class="line">int STATE_TURNING_OFF = 13; //蓝牙正在关闭</div><div class="line">int STATE_TURNING_ON = 11; //蓝牙正在打开</div></pre></td></tr></table></figure>
+<p>  对应的广播</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String ACTION_STATE_CHANGED = &quot;android.bluetooth.adapter.action.STATE_CHANGED&quot;</div></pre></td></tr></table></figure>
+<p>  监听到这个广播之后,通过<code>intent</code>中的<code>EXTRA_STATE</code>获取对应的状态值</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,BluetoothAdapter.STATE_OFF);</div></pre></td></tr></table></figure>
+<h4 id="打开蓝牙的广播"><a href="#打开蓝牙的广播" class="headerlink" title="打开蓝牙的广播"></a>打开蓝牙的广播</h4><p>  可以通过广播调用系统的<code>activity</code>来打开蓝牙，对应的广播</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String ACTION_REQUEST_ENABLE = &quot;android.bluetooth.adapter.action.REQUEST_ENABLE&quot;;</div></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);</div><div class="line">startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);</div></pre></td></tr></table></figure>
+<p>  执行这个广播之后，可以通过监听广播<code>ACTION_STATE_CHANGED</code>,来判断蓝牙是否打开</p>
+<h4 id="蓝牙扫描的广播"><a href="#蓝牙扫描的广播" class="headerlink" title="蓝牙扫描的广播"></a>蓝牙扫描的广播</h4><p>  打开蓝牙之后，可以通过方法<code>startDiscovery()</code>,来扫描设备周边可以使用的其他的蓝牙设备，这个方法会触发下面的广播</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">String ACTION_DISCOVERY_STARTED = &quot;android.bluetooth.adapter.action.DISCOVERY_STARTED&quot;;  //开始扫描</div><div class="line">String ACTION_DISCOVERY_FINISHED = &quot;android.bluetooth.adapter.action.DISCOVERY_FINISHED&quot;; //扫描结束</div></pre></td></tr></table></figure>
+<p>  如果扫描到可用的设备，还会触发广播</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String ACTION_FOUND = &quot;android.bluetooth.device.action.FOUND&quot; //属于类 `BluetoothDevice`</div></pre></td></tr></table></figure>
+<blockquote>
+<p>注意在6.0之后的设备，如果想监听这个广播，还必须添加权限</p>
+</blockquote>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;android.permission.ACCESS_COARSE_LOCATION&quot;/&gt;</div><div class="line">&lt;uses-permission android:name=&quot;android.permission.ACCESS_FINE_LOCATION&quot;/&gt;</div></pre></td></tr></table></figure>
+<p>  在应用中申请</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ActivityCompat.requestPermissions(this,new String[]&#123;android.Manifest.permission.ACCESS_COARSE_LOCATION,</div><div class="line">              android.Manifest.permission.ACCESS_FINE_LOCATION&#125;,2);</div></pre></td></tr></table></figure>
+<p>  不然在6.0之后的设备中监听不到这个广播</p>
+<p>  监听到广播<code>ACTION_FOUND</code>,可用获得设备相关的信息</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);</div><div class="line">String name = device.getName();</div><div class="line">String addr = device.getAddress();</div><div class="line">//还有其他相关的信息</div></pre></td></tr></table></figure>
+<h4 id="获得设备的UUID的广播"><a href="#获得设备的UUID的广播" class="headerlink" title="获得设备的UUID的广播"></a>获得设备的UUID的广播</h4><p>  在扫描到设备之后，可用调用方法<code>fetchUuidsWithSdp()</code>,调用这个方法会触发这个广播<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String ACTION_UUID = &quot;android.bluetooth.device.action.UUID&quot;;</div></pre></td></tr></table></figure></p>
+<p>  通过<code>intent</code>中的<code>EXTRA_UUID</code>,获取设备的UUID</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);</div><div class="line">for (int i=0; i&lt;uuidExtra.length; i++) &#123;</div><div class="line">     String uuid = uuidExtra[i].toString();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="蓝牙配对的广播"><a href="#蓝牙配对的广播" class="headerlink" title="蓝牙配对的广播"></a>蓝牙配对的广播</h4><p>  有蓝牙设备的配对请求时，会监听到这个广播<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String ACTION_PAIRING_REQUEST = &quot;android.bluetooth.device.action.PAIRING_REQUEST&quot;;</div></pre></td></tr></table></figure></p>
+<h4 id="蓝牙配对状态的广播"><a href="#蓝牙配对状态的广播" class="headerlink" title="蓝牙配对状态的广播"></a>蓝牙配对状态的广播</h4><p>  在进行配对时，可用通过监听配对的状态判断设备是否已经配对成功<br>  配对的状态值</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int BOND_NONE = 10; //配对没有成功</div><div class="line">int BOND_BONDING = 11; //配对中</div><div class="line">int BOND_BONDED = 12; //配对成功</div></pre></td></tr></table></figure>
+<p>  广播</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String ACTION_BOND_STATE_CHANGED = &quot;android.bluetooth.device.action.BOND_STATE_CHANGED&quot;;</div></pre></td></tr></table></figure>
+<p>  获取值</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.BOND_NONE); //当前的配对的状态</div><div class="line">int state = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.BOND_NONE); //前一次的配对状态</div><div class="line">BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); //配对的设备信息</div></pre></td></tr></table></figure>
+<h4 id="蓝牙连接状态的广播"><a href="#蓝牙连接状态的广播" class="headerlink" title="蓝牙连接状态的广播"></a>蓝牙连接状态的广播</h4><p>  配对之后，连接设备可以通过监听下面的广播，判断设备是否连接成功</p>
+<p>  连接的状态值</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int STATE_DISCONNECTED = 0; //未连接</div><div class="line">int STATE_CONNECTING = 1; //连接中</div><div class="line">int STATE_CONNECTED = 2; //连接成功</div></pre></td></tr></table></figure>
+<p>  广播</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String ACTION_CONNECTION_STATE_CHANGED = &quot;android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED&quot;;</div></pre></td></tr></table></figure>
+<p>  获取值</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, BluetoothAdapter.ERROR); //当前的连接状态</div><div class="line">int state = intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_CONNECTION_STATE, BluetoothAdapter.ERROR); //前一次的连接状态</div><div class="line">BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); //连接的设备信息</div></pre></td></tr></table></figure>
+<h4 id="蓝牙设备的名字变化的广播"><a href="#蓝牙设备的名字变化的广播" class="headerlink" title="蓝牙设备的名字变化的广播"></a>蓝牙设备的名字变化的广播</h4>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">String ACTION_LOCAL_NAME_CHANGED = &quot;android.bluetooth.adapter.action.LOCAL_NAME_CHANGED&quot; ; //本地设备的蓝牙设备的名称变化 `BluetoothAdapter`</div><div class="line">String ACTION_NAME_CHANGED = &quot;android.bluetooth.device.action.NAME_CHANGED&quot; ;// 远程设备的名称的变化 `BluetoothDevice`</div></pre></td></tr></table></figure>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2016/11/18/contentprovider/" data-toggle="tooltip" data-placement="top" title="Android 使用ContentProvider在应用间共享数据">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2016/11/18/bottomsheet/" data-toggle="tooltip" data-placement="top" title="Android Support Library - BottomSheet">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/codeminer-33">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/gbaidu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/coderminer">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+				<!--
+                <p class="copyright text-muted">
+                    Copyright &copy; 矿工日志 2016 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks">Kaijun</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
+                    </iframe>
+                </p> -->
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://coderminer.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.staticfile.org/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://coderminer.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
