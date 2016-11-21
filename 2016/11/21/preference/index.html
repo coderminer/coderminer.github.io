@@ -1,0 +1,755 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Preference,设置界面," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Android设置界面之Preference    
+  Android系统为设置界面的UI提供了一系列的接口，设置界面的部分和Activity是分离的，会有一个PreferenceScreen的对象  是根目录，在其中会包含CheckBoxPreference EditTextPreference ListPreference PreferenceCategory RingtonePrefere">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android设置界面之Preference">
+<meta property="og:url" content="https://coderminer.github.io/2016/11/21/preference/index.html">
+<meta property="og:site_name" content="矿工日志">
+<meta property="og:description" content="Android设置界面之Preference    
+  Android系统为设置界面的UI提供了一系列的接口，设置界面的部分和Activity是分离的，会有一个PreferenceScreen的对象  是根目录，在其中会包含CheckBoxPreference EditTextPreference ListPreference PreferenceCategory RingtonePrefere">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2972448-88e9067ddd9e9d15.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2016-11-21T05:43:14.480Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android设置界面之Preference">
+<meta name="twitter:description" content="Android设置界面之Preference    
+  Android系统为设置界面的UI提供了一系列的接口，设置界面的部分和Activity是分离的，会有一个PreferenceScreen的对象  是根目录，在其中会包含CheckBoxPreference EditTextPreference ListPreference PreferenceCategory RingtonePrefere">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2972448-88e9067ddd9e9d15.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://coderminer.github.io/2016/11/21/preference/"/>
+
+
+
+
+
+  <title> Android设置界面之Preference | 矿工日志 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?caaed2d3cc51fc50db64a4b8821bd374";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">矿工日志</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Make a better life!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://coderminer.github.io/2016/11/21/preference/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="coderminer">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/img/avatar.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="矿工日志">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="矿工日志" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android设置界面之Preference
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-21T13:42:43+08:00">
+                2016-11-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <a href="/2016/11/21/preference/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/21/preference/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Android设置界面之Preference"><a href="#Android设置界面之Preference" class="headerlink" title="Android设置界面之Preference"></a>Android设置界面之Preference</h3><p>  <img src="http://upload-images.jianshu.io/upload_images/2972448-88e9067ddd9e9d15.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="题图 www.gratisography.com">  </p>
+<p>  <code>Android</code>系统为设置界面的UI提供了一系列的接口，设置界面的部分和<code>Activity</code>是分离的，会有一个<code>PreferenceScreen</code>的对象<br>  是根目录，在其中会包含<code>CheckBoxPreference</code> <code>EditTextPreference</code> <code>ListPreference</code> <code>PreferenceCategory</code> <code>RingtonePreference</code></p>
+<ul>
+<li><p>相关的接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Preference.OnPreferenceChangeListener</div><div class="line">Preference.OnPreferenceClickListener</div><div class="line">PreferenceFragment.OnPreferenceStartFragmentCallback</div><div class="line">PreferenceManager.OnActivityDestroyListener</div><div class="line">PreferenceManager.OnActivityResultListener</div><div class="line">PreferenceManager.OnActivityStopListener</div></pre></td></tr></table></figure>
+</li>
+<li><p>相关的类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">CheckBoxPreference</div><div class="line">DialogPreference</div><div class="line">EditTextPreference</div><div class="line">ListPreference</div><div class="line">MultiSelectListPreference</div><div class="line">Preference</div><div class="line">Preference.BaseSavedState</div><div class="line">PreferenceActivity</div><div class="line">PreferenceActivity.Header</div><div class="line">PreferenceCategory</div><div class="line">PreferenceFragment</div><div class="line">PreferenceGroup</div><div class="line">PreferenceManager</div><div class="line">PreferenceScreen</div><div class="line">RingtonePreference</div><div class="line">SwitchPreference</div><div class="line">TwoStatePreference</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>  由于设置的界面是使用<code>Preference</code>而不是<code>View</code>来创建的，需要特殊的<code>Activity</code>或者<code>Fragment</code>的子类来显示</p>
+<ul>
+<li>版本低于<code>Android 3.0(API 10)</code>，请使用<code>PreferenceActivity</code></li>
+<li>版本高于<code>Android 3.0(API 10)</code>，可以在普通的<code>Activity</code>中使用<code>PreferenceFragment</code>来显示，也可以使用<code>PreferenceActivity</code></li>
+</ul>
+<h4 id="在XML中定义Preference"><a href="#在XML中定义Preference" class="headerlink" title="在XML中定义Preference"></a>在XML中定义Preference</h4><p>  可以在运行时创建<code>Preference</code>也可以通过在xml中定义<code>Preference</code>,每一个<code>Preference</code>的子类都可以用XML中的元素来定义，在 <code>res/xml/</code><br>  文件夹中创建一个文件如<code>preference.xml</code></p>
+<blockquote>
+<p>如果想定义分屏的设置布局，需要分别定义XML</p>
+</blockquote>
+<p>  <code>preference.xml</code>一般的布局如下：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;PreferenceScreen xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;</div><div class="line">    &lt;CheckBoxPreference</div><div class="line">        android:key=&quot;pref_sync&quot;</div><div class="line">        android:title=&quot;@string/pref_sync&quot;</div><div class="line">        android:summary=&quot;@string/pref_sync_summ&quot;</div><div class="line">        android:defaultValue=&quot;true&quot; /&gt;</div><div class="line">    &lt;ListPreference</div><div class="line">        android:dependency=&quot;pref_sync&quot;</div><div class="line">        android:key=&quot;pref_syncConnectionType&quot;</div><div class="line">        android:title=&quot;@string/pref_syncConnectionType&quot;</div><div class="line">        android:dialogTitle=&quot;@string/pref_syncConnectionType&quot;</div><div class="line">        android:entries=&quot;@array/pref_syncConnectionTypes_entries&quot;</div><div class="line">        android:entryValues=&quot;@array/pref_syncConnectionTypes_values&quot;</div><div class="line">        android:defaultValue=&quot;@string/pref_syncConnectionTypes_default&quot; /&gt;</div><div class="line">&lt;/PreferenceScreen&gt;</div></pre></td></tr></table></figure>
+<h4 id="创建PreferenceActivity"><a href="#创建PreferenceActivity" class="headerlink" title="创建PreferenceActivity"></a>创建PreferenceActivity</h4><ul>
+<li><p>定义xml文件</p>
+<p>在<code>res/xml/</code>文件夹中定义 <code>preference.xml</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;PreferenceScreen</div><div class="line">    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;</div><div class="line">    &lt;PreferenceCategory</div><div class="line">        android:title=&quot;@string/inline_preferences&quot;&gt;</div><div class="line">        &lt;CheckBoxPreference</div><div class="line">            android:key=&quot;check_box_pref&quot;</div><div class="line">            android:title=&quot;@string/title_checkbox_preference&quot;</div><div class="line">            android:summary=&quot;@string/summary_checkbox_preference&quot;&gt;</div><div class="line">            .....</div><div class="line">        &lt;/CheckBoxPreference&gt;</div><div class="line">    &lt;/PreferenceCategory&gt;</div><div class="line">&lt;/PreferenceScreen&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>Activity</code>继承<code>PreferenceActivity</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class SettingsActivity1 extends PreferenceActivity&#123;</div><div class="line"></div><div class="line">@Override</div><div class="line">protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">    super.onCreate(savedInstanceState);</div><div class="line">    addPreferencesFromResource(R.xml.preference); //API 10之后的版本这个方法以及过时，推荐使用Fragment的方式</div><div class="line">  &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="使用Preference-Fragments"><a href="#使用Preference-Fragments" class="headerlink" title="使用Preference Fragments"></a>使用Preference Fragments</h4><p>  在高于<code>Android 3.0(API 10)</code>的版本，应该使用<code>PreferenceFragment</code>来显示<code>Preference</code>,就不需要继承<code>PreferenceActivity</code><br>  继承<code>PreferenceFragment</code>在<code>onCreate()</code>方法中调用<code>addPreferencesFromResource()</code>方法</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class SettingsFragment extends PreferenceFragment&#123;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  public void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">      super.onCreate(savedInstanceState);</div><div class="line">      this.addPreferencesFromResource(R.xml.preference);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  创建一个<code>Activity</code>,然后将定义的Fragments添加到当前的<code>Activity</code>中,最终呈现的效果和<code>PreferenceActivity</code>是一样的</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public class SettingsActivity2 extends Activity&#123;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">      super.onCreate(savedInstanceState);</div><div class="line">      this.getFragmentManager().beginTransaction()</div><div class="line">          .replace(android.R.id.content, new SettingsFragment())</div><div class="line">          .commit();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>显示新条目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;PreferenceCategory</div><div class="line">    android:title=&quot;@string/dialog_based_preferences&quot;&gt;</div><div class="line">  &lt;!-- 添加对应的preference 如PreferenceScreen EditTextPreference 等--&gt;</div><div class="line">&lt;/PreferenceCategory&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>list view preference</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;ListPreference</div><div class="line">  android:key=&quot;list_preference&quot;</div><div class="line">  android:title=&quot;@string/title_list_preference&quot;</div><div class="line">  android:summary=&quot;@string/summary_list_preference&quot;</div><div class="line">  android:entries=&quot;@array/entries_list_preference&quot;</div><div class="line">  android:entryValues=&quot;@array/entryvalues_list_preference&quot;</div><div class="line">  android:dialogTitle=&quot;@string/dialog_title_list_preference&quot;/&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>输入框</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;EditTextPreference</div><div class="line">          android:key=&quot;edit_preference&quot;</div><div class="line">          android:title=&quot;@string/title_edittext_preference&quot;</div><div class="line">          android:summary=&quot;@string/summary_edittext_preference&quot;</div><div class="line">          android:dialogTitle=&quot;@string/dialog_title_edittext_preference&quot;</div><div class="line">          /&gt;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="使用Preference-Header"><a href="#使用Preference-Header" class="headerlink" title="使用Preference Header"></a>使用Preference Header</h4><ul>
+<li>为每一个设置文件单独创建一个<code>PreferenceFragment</code>的实例</li>
+<li>创建headers的XML文件，在fragment中设置对应的<code>PreferenceFragment</code>的实例</li>
+<li>使用<code>PreferenceActivity</code></li>
+<li><p>实现<code>obBuildHeaders()</code>方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;preference-headers</div><div class="line">  xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;</div><div class="line">  &lt;header</div><div class="line">      android:fragment=&quot;com.example.demo.preference$PrefsFragment1&quot;</div><div class="line">      android:title=&quot;Pref 1&quot;</div><div class="line">      android:summary=&quot;An example of some preferences.&quot;&gt;</div><div class="line"></div><div class="line">  &lt;/header&gt;</div><div class="line">  &lt;header</div><div class="line">      android:fragment=&quot;com.example.demo.preference$PrefsFragment2&quot;</div><div class="line">      android:title=&quot;Pref 2&quot;</div><div class="line">      android:summary=&quot;Another example of some preferences.&quot;&gt;</div><div class="line"></div><div class="line">  &lt;/header&gt;</div><div class="line">  &lt;extra android:name=&quot;test&quot; android:value=&quot;testvalue&quot; /&gt;</div><div class="line">&lt;/preference-headers&gt;</div></pre></td></tr></table></figure>
+<p><code>&lt;extras&gt;</code>元素中的内容，可以通过<code>Bundle</code>获得，通过方法<code>getArguments()</code>获取   </p>
+<p>显示headers使用<code>PreferenceActivity</code>的回调方法<code>onBuildHeaders()</code>加载preference-headers.xml文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void onBuildHeaders(List&lt;Header&gt; target) &#123;</div><div class="line">    super.onBuildHeaders(target);</div><div class="line">    loadHeadersFromResource(R.xml.preference_header, target);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="自定义Preference的布局"><a href="#自定义Preference的布局" class="headerlink" title="自定义Preference的布局"></a>自定义Preference的布局</h4><p>  通过<code>Preference</code>的属性<code>android:layout=&quot;&quot;</code>设置自定义的layout文件</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Preference/" rel="tag"># Preference</a>
+          
+            <a href="/tags/设置界面/" rel="tag"># 设置界面</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/21/glideintro/" rel="next" title="Android开源框架Glide的使用">
+                <i class="fa fa-chevron-left"></i> Android开源框架Glide的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/21/toast/" rel="prev" title="Android自定义Toast">
+                Android自定义Toast <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/11/21/preference/"
+           data-title="Android设置界面之Preference" data-url="https://coderminer.github.io/2016/11/21/preference/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/img/avatar.jpg"
+               alt="coderminer" />
+          <p class="site-author-name" itemprop="name">coderminer</p>
+          <p class="site-description motion-element" itemprop="description">向往自由生活</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">40</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">53</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/coderminer" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/gbaidu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Android设置界面之Preference"><span class="nav-number">1.</span> <span class="nav-text">Android设置界面之Preference</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#概述"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在XML中定义Preference"><span class="nav-number">1.2.</span> <span class="nav-text">在XML中定义Preference</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建PreferenceActivity"><span class="nav-number">1.3.</span> <span class="nav-text">创建PreferenceActivity</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用Preference-Fragments"><span class="nav-number">1.4.</span> <span class="nav-text">使用Preference Fragments</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用Preference-Header"><span class="nav-number">1.5.</span> <span class="nav-text">使用Preference Header</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义Preference的布局"><span class="nav-number">1.6.</span> <span class="nav-text">自定义Preference的布局</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">coderminer</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"coderminer"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
